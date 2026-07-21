@@ -1,0 +1,2 @@
+# Ignore Talend Open Studio directory as it is large and not part of the source code
+TOS_DI-*/

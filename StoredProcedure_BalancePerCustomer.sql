@@ -1,0 +1,25 @@
+USE DWH;
+GO
+
+CREATE PROCEDURE BalancePerCustomer
+    @name VARCHAR(100)
+AS
+BEGIN
+    SELECT 
+        c.CustomerName,
+        a.AccountType,
+        a.Balance,
+        a.Balance + ISNULL(SUM(
+            CASE 
+                WHEN f.TransactionType = 'Deposit' THEN f.Amount
+                ELSE -f.Amount
+            END
+        ), 0) AS CurrentBalance
+    FROM DimCustomer c
+    JOIN DimAccount a ON c.CustomerID = a.CustomerID
+    LEFT JOIN FactTransaction f ON a.AccountID = f.AccountID
+    WHERE c.CustomerName = @name
+        AND a.Status = 'active'
+    GROUP BY c.CustomerName, a.AccountType, a.Balance;
+END
+GO
